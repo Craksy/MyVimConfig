@@ -1,6 +1,6 @@
 set nocompatible
 
-let mapleader = "\<Space>" 
+let mapleader = "\<Space>"
 filetype off
 set rtp+=~/.vim/bundle/Vundle.vim
 call vundle#begin()
@@ -10,7 +10,8 @@ Plugin 'vim-scripts/indentpython.vim'
 Plugin 'scrooloose/nerdtree'
 Plugin 'scrooloose/nerdcommenter'
 Plugin 'scrooloose/syntastic'
-Plugin 'valloric/youcompleteme'
+"Plugin 'valloric/youcompleteme'
+Plugin 'Shougo/deoplete.nvim'
 Plugin 'jnurmine/Zenburn'
 Plugin 'vim-airline/vim-airline'
 Plugin 'vim-airline/vim-airline-themes'
@@ -18,7 +19,7 @@ Plugin 'tpope/vim-fugitive'
 Plugin 'junegunn/fzf.vim'
 Plugin 'junegunn/fzf'
 "Plugin 'terryma/vim-multiple-cursors'
-Plugin 'Valloric/YouCompleteMe'
+"Plugin 'Valloric/YouCompleteMe'
 Plugin 'tomasiser/vim-code-dark'
 Plugin 'easymotion/vim-easymotion'
 " snippet setup
@@ -51,19 +52,19 @@ set splitright
 nohl
 set foldmethod=indent
 set foldlevel=99
-syntax enable 
+syntax enable
 set expandtab
-set tabstop=2 
-set incsearch 
+set tabstop=2
+set incsearch
 
 augroup MyAutoCmds
         au!
         au BufNewFile,BufRead *.py
-                                \set tabstop=4 
-                                \ set softtabstop=4 
-                                \ set shiftwidth=4 
-                                \ set textwidth=79 
-                                \ set expandtab 
+                                \set tabstop=4
+                                \ set softtabstop=4
+                                \ set shiftwidth=4
+                                \ set textwidth=79
+                                \ set expandtab
                                 \ set autoindent
 
         au InsertEnter * :set norelativenumber
@@ -78,14 +79,13 @@ augroup end
 
 
 
-
 """""""""""""""""""""""""""""""""""
 "mappings
 """""""""""""""""""""""""""""""""""
 "=======================
 "Buffer mappings
 "=======================
-nnoremap <leader>b<tab>       :bn<cr> 
+nnoremap <leader>b<tab>       :bn<cr>
 nnoremap <leader>bp           :bv<cr>
 nnoremap <leader>bk           :bd<cr>
 nnoremap <leader>bb           :ls<cr>
@@ -101,7 +101,7 @@ nmap <leader>7 <Plug>AirlineSelectTab7
 nmap <leader>8 <Plug>AirlineSelectTab8
 nmap <leader>9 <Plug>AirlineSelectTab9
 
-inoremap jj <esc>
+inoremap jk <esc>
 
 nnoremap <leader>hl :nohl<CR>
 "=======================
@@ -127,22 +127,28 @@ nnoremap <leader><tab>        :bn<cr>
 
 
 "=======================
-"Command and search mappings
+"Command mappings
 "=======================
-nmap <leader>, <Plug>(easymotion-s)
+"nmap <leader><leader>s <Plug>(easymotion-s)
+nmap <Plug>(easymotion-prefix)s <Plug>(easymotion-s)
 nmap <leader><leader>, <Plug>(easymotion-jumptoanywhere)
-nmap <leader>. :FZF<cr>
- 
+nnoremap <leader>. :FZF<cr>
 
 "=======================
-"help mappings
+"Jumping
 "=======================
-nnoremap <leader>hh :vert help<space>
-nnoremap <leader>hH :vert help<cr>
-nnoremap <leader>hs :help<space>
+nnoremap <leader>jd :YcmCompleter GoToDefinition<cr>
+nnoremap <leader>jj :YcmCompleter GoTo<cr>
 
-nnoremap , :
 
+"=======================
+"Practise mappings
+"=======================
+inoremap <esc> <nop>
+inoremap <Right> <nop>
+inoremap <Left> <nop>
+inoremap <Up> <nop>
+inoremap <Down> <nop>
 
 
 
@@ -156,7 +162,7 @@ let g:airline_powerline_fonts = 1
 
  if !exists('g:airline_symbols')
      let g:airline_symbols = {}
-     endif
+ endif
 
      " unicode symbols
      let g:airline_left_sep = '»'
