@@ -1,0 +1,38 @@
+{
+        "suggest.completionItemKindLabels": {
+                "text": "",
+                "unit": "",
+                "enum": "",
+                "file": "",
+                "field": "料",
+                "color": "",
+                "event": "鬒",
+                "class": " ",
+                "value": "",
+                "method": "",
+                "module": "",
+                "folder": "",
+                "struct": "פּ",
+                "default":"",
+                "snippet":"",
+                "keyword":" ",
+                "function": "ƒ",
+                "variable": "",
+                "property": "",
+                "constant": "",
+                "operator": "Ψ",
+                "interface":"",
+                "reference":"渚",
+                "enumMember":"",
+                "typeParameter": ""
+        },
+
+        
+        "signature.enable": true
+        
+        
+
+}
+
+
+
