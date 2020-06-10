@@ -16,32 +16,27 @@ if dein#load_state('~/dein')
         call dein#add('~/dein/repos/github.com/Shougo/dein.vim')
         "plugins go here
         
-        
-        "call dein#add('Shougo/deoplete.nvim')
-
-
+        call dein#add('flazz/vim-colorschemes')
         call dein#add('vim-scripts/indentpython.vim')
-        call dein#add('scrooloose/nerdtree')
+        "call dein#add('scrooloose/nerdtree')
         call dein#add('scrooloose/nerdcommenter')
         call dein#add('scrooloose/syntastic')
         call dein#add('morhetz/gruvbox')
         call dein#add('neoclide/coc.nvim', {'merged':0, 'rev': 'release'})
-        "Plugin 'valloric/youcompleteme'
-        "Plugin 'Shougo/deoplete.nvim'        
         call dein#add('jnurmine/Zenburn')
         call dein#add('vim-airline/vim-airline')
         call dein#add('vim-airline/vim-airline-themes')
         call dein#add('tpope/vim-fugitive')
-        "call dein#add('junegunn/fzf.vim')
-        "call dein#add('junegunn/fzf')
-
-        "Plugin 'terryma/vim-multiple-cursors'
+        call dein#add('junegunn/fzf.vim')
+        call dein#add('junegunn/fzf')
+        "call dein#add('tmux-plugins/vim-tmux')
         call dein#add('whatyouhide/vim-gotham')
-
+        call dein#add('vimwiki/vimwiki')
+        call dein#add('guns/xterm-color-table.vim')
         "Plugin 'Valloric/YouCompleteMe'        
         call dein#add('tomasiser/vim-code-dark')
         call dein#add('easymotion/vim-easymotion')
-
+        "call dein#add('christoomey/vim-tmux-navigator')
         " snippet setup        
         "call dein#add('SirVer/ultisnips')
         call dein#add('honza/vim-snippets')
@@ -53,6 +48,7 @@ if dein#load_state('~/dein')
         call dein#end()
         call dein#save_state()
 endif
+filetype plugin on
 filetype plugin indent on
 syntax enable
 colorscheme gruvbox
@@ -76,10 +72,24 @@ set incsearch
 set signcolumn=yes
 set updatetime=300
 set shortmess+=c
+set nowrap
+set nobackup
+set termguicolors
 
 
+let mainWiki = {}
+let mainWiki.path='~/vimwiki/main_wiki/'
+let mainWiki.html_path='~/vimwiki/html'
 
+let pythonWiki = {}
+let pythonWiki.path='~/vimwiki/python_wiki/'
+let pythonWiki.html_path='~/vimwiki/html/python'
 
+let configWiki = {}
+let configWiki.path='~/vimwiki/config_wiki/'
+let configWiki.html_path='~/vimwiki/html/config'
+
+let g:vimwiki_list=[mainWiki, pythonWiki, configWiki]
 "========================================
 "Airline configuration
 "========================================
@@ -103,19 +113,60 @@ augroup MyAutoCmds
         au InsertLeave * :set relativenumber
         
         autocmd User CocJumpPlaceholder call CocActionAsync('showSignatureHelp')
+
+        au BufNewFile,BufRead *.ebnf set filetype=ebnf
 augroup end
 
 
+function! VimwikiLinkHandler(link)
+    " Use Vim to open external files with the 'vfile:' scheme.  E.g.:
+    "   1) [[vfile:~/Code/PythonProject/abc123.py]]
+    "   2) [[vfile:./|Wiki Home]]
+    let link = a:link
+    if link =~# '^vfile:'
+      return HandleVFileLink(link[1:])
+    elseif link =~# '^exe:'
+        return HandleExeLink(link[4:])
+    else
+      return 0
+    endif
+  endfunction
+
+fu! HandleVFileLink(link)
+    let link_infos = vimwiki#base#resolve_link(a:link)
+    if link_infos.filename == ''
+      echomsg 'Vimwiki Error: Unable to resolve link!'
+     return 0
+    else
+      exe 'edit ' . fnameescape(link_infos.filename)
+      return 1
+    endif
+endfu
+
+fu! HandleExeLink(link)
+        try
+                "echomsg a:link
+                execute a:link
+        catch /.*/
+                echomsg 'Vimwiki Error: Unable to run command'
+                return 0
+        endtry
+        return 1
+endfu
 """"""""""""""""""""""""""""""""""
 "mappings
 """""""""""""""""""""""""""""""""""
+nnoremap <M-o>  o<esc>
+nnoremap <M-O>  O<esc>
+
+
 "=======================
 "Buffer mappings
 "=======================
 nnoremap <leader>b<tab>       :bn<cr>
 nnoremap <leader>bp           :bv<cr>
 nnoremap <leader>bk           :bd<cr>
-nnoremap <leader>bb           :ls<cr>
+nnoremap <leader>bb           :<C-u>CocList buffers<cr>
 nnoremap <leader>bav          :vert ball<cr>
 
 nmap <leader>1 <Plug>AirlineSelectTab1
@@ -141,11 +192,15 @@ nnoremap <leader>fvv :e ~/.vimrc<cr>
 nnoremap <leader>fvn :e $MYVIMRC<cr> 
 nnoremap <leader>fvr :so $MYVIMRC<cr>
 
+"##############################
+"## FZF Stuff #################
+"##############################
+
+nnoremap <leader>ff :<C-u>CocList FilE
+
 "=======================
 "Terminal related mappings
 "=======================
-nnoremap <leader>tt  :term
-nnoremap <leader>ts  :split
 
 "=======================
 "Window related mappings
@@ -166,8 +221,16 @@ nnoremap <leader><tab>        :bn<cr>
 "nmap <leader><leader>s <Plug>(easymotion-s)
 map ,  <Plug>(easymotion-prefix)
 nmap <Plug>(easymotion-prefix)s <Plug>(easymotion-s)
+nmap f ,s
 "nmap <leader>, <Plug>(easymotion-jumptoanywhere)
 
+let g:tmux_navigator_no_mappings = 1
+
+nnoremap <silent> <M-h> :TmuxNavigateLeft<cr>
+nnoremap <silent> <M-j> :TmuxNavigateDown<cr>
+nnoremap <silent> <M-k> :TmuxNavigateUp<cr>
+nnoremap <silent> <M-l> :TmuxNavigateRight<cr>
+nnoremap <silent> <M-p> :TmuxNavigatePrevious<cr>
 
 "=======================
 " Practise mappings
@@ -183,7 +246,6 @@ inoremap <Left> <nop>
 inoremap <Up> <nop>
 inoremap <Down> <nop>
 
-map ;     :
 
 
 "=======================
@@ -213,7 +275,30 @@ endif
 xmap <leader>a <Plug>(coc-codeaction-selected)
 nmap <leader>a <Plug>(coc-codeaction-selected)
 
+" Use `[g` and `]g` to navigate diagnostics
+nmap <silent> [g <Plug>(coc-diagnostic-prev)
+nmap <silent> ]g <Plug>(coc-diagnostic-next)
 
+" GoTo code navigation.
+nmap <silent> gd <Plug>(coc-definition)
+nmap <silent> gy <Plug>(coc-type-definition)
+nmap <silent> gi <Plug>(coc-implementation)
+nmap <silent> gr <Plug>(coc-references)
+
+nmap <silent> <TAB> <Plug>(coc-range-select)
+xmap <silent> <TAB> <Plug>(coc-range-select)
+xmap <silent> <S-TAB> <Plug>(coc-range-select-backword)
+
+" Use K to show documentation in preview window.
+nnoremap <silent> K :call <SID>show_documentation()<CR>
+
+function! s:show_documentation()
+  if (index(['vim','help'], &filetype) >= 0)
+    execute 'h '.expand('<cword>')
+  else
+    call CocAction('doHover')
+  endif
+endfunction
 
 xmap if <Plug>(coc-funcobj-i)
 omap if <Plug>(coc-funcobj-i)
@@ -224,6 +309,7 @@ omap ic <Plug>(coc-classobj-i)
 xmap ac <Plug>(coc-classobj-a)
 omap ac <Plug>(coc-classobj-a)
 
+nmap <F2> <Plug>(coc-rename)
 
 nnoremap <silent> <leader>oa  :<C-u>CocList diagnostics<cr>
 " Manage extensions.
@@ -240,7 +326,9 @@ nnoremap <silent> <leader>oj  :<C-u>CocNext<CR>
 nnoremap <silent> <leader>ok  :<C-u>CocPrev<CR>
 " " Resume latest coc list.
 nnoremap <silent> <leader>op  :<C-u>CocListResume<CR>
-nnoremap <silent> <leader>of  :<C-u>CocList lists<CR>
+nnoremap <silent> <leader>ol  :<C-u>CocList lists<CR>
+nnoremap <silent> <leader>of  :<C-u>CocList --auto-preview files<CR>
+nnoremap <silent> <leader>oF  :<C-u>CocList folders<CR>
 
 
 
